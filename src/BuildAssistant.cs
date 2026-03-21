@@ -10,53 +10,31 @@ public class ProjectConfig
 
 public static class BuildAssistant
 {
+    private static readonly List<IBuilder> Builders = new()
+    {
+        new CsBuilder(),
+        //new GccBuilder();
+        new RustBuilder(),
+        //new GoBuilder(),
+        //new JavaBuilder();
+        //new PythonBuilder()
+    };
+
     public static void Build()
     {
         var config = JsonHandler.LoadConfig();
-        if (config == null || string.IsNullOrEmpty(config.MainFile)) return;
-        string compiler = DetectCompiler(config.MainFile);
-
-        if (compiler == "dotnet")
+        if (config == null || string.IsNullOrEmpty(config.MainFile)) 
         {
-            Log(Default, "csharp project detected\n");
-            var projectFiles = Directory.GetFiles(Directory.GetCurrentDirectory(), "*.csproj");
-            if (projectFiles.Length == 0)
-            {
-                Log(Err, ".csproj file missing\n");
-                return;
-            }
-            string targetProject = projectFiles[0];
-            string outPath = string.IsNullOrWhiteSpace(config.OutputFile) ? "bob-out" : config.OutputFile;
-            string cmd = "dotnet";
-            string args = $"publish {targetProject} {config.CompilerFlags} -o {outPath}";
-            Log(Default, $"running '{cmd} {args}'\n");
-            int result = CommandRunner.Run(cmd, args);
-
-            if (result == 0)
-                Log(Success, $"build finished successfully. output located in {outPath}\n");
-            else
-                Log(Err, "project build failed. make sure if bob-config.json is correct.\n");
-                
+            Log(Err, "MainFile is missing in bob-config.json\n");
             return;
         }
 
-        // todo: cpp, c, rust and go
+        string extension = Path.GetExtension(config.MainFile).ToLower();
+        var builder = Builders.FirstOrDefault(b => b.CanHandle(extension));
+
+        if (builder != null)
+            builder.Build(config);
         else
-            Log(Err, "invalid or unsupported file type\n");
-    }
-
-    private static string DetectCompiler(string mainFile)
-    {
-        string extension = Path.GetExtension(mainFile).ToLower();
-
-        return extension switch
-        {
-            ".cpp" or ".cc" or ".cxx" => "g++",
-            ".c" => "gcc",
-            ".cs" => "dotnet",
-            ".rs" => "cargo",
-            ".go" => "go",
-            _ => ""
-        };
+            Log(Err, $"no builder found for {extension}\n");
     }
 }

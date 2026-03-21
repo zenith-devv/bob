@@ -14,39 +14,22 @@ public static class CommandRunner
             CreateNoWindow = true
         };
 
-        using var process = Process.Start(startInfo);
-        if (process == null) return -1;
-
-        string output = process.StandardOutput.ReadToEnd();
-        string error = process.StandardError.ReadToEnd();
-        process.WaitForExit();
-
-        if (!string.IsNullOrWhiteSpace(output)) 
-            Console.WriteLine(output);
-
-        if (!string.IsNullOrWhiteSpace(error)) 
-            Console.WriteLine(error);
-
-        return process.ExitCode;
-    }
-
-    public static int RunQuiet(string fileName, string arguments)
-    {
-        var startInfo = new ProcessStartInfo
+        using var process = new Process { StartInfo = startInfo };
+        process.OutputDataReceived += (sender, e) => 
         {
-            FileName = fileName,
-            Arguments = arguments,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            UseShellExecute = false,
-            CreateNoWindow = true
+            if (e.Data != null) Console.WriteLine(e.Data);
+        };
+        process.ErrorDataReceived += (sender, e) => 
+        {
+            if (e.Data != null) Console.WriteLine(e.Data); 
         };
 
-        using var process = Process.Start(startInfo);
-        if (process == null) return -1;
+        if (!process.Start()) return -1;
         
+        process.BeginOutputReadLine();
+        process.BeginErrorReadLine();
+
         process.WaitForExit();
-        
         return process.ExitCode;
     }
 }
