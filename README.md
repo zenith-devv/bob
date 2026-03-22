@@ -29,3 +29,8 @@ Based on that bob will run `dotnet publish bob.csproj -c Release -r linux-x64 --
 * (planned) **Java**
 ## Setup
 To compile bob, run `dotnet publish bob.csproj -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true` (if on Windows then use `win-x64`). Then add the output binary to your system `PATH`. 
+## Available commands
+* **bob build** - read bob-config.json and compile project to executable
+* (planned) **bob fetch** - clone a repository and automatically build the project (if bobconfig.json exists)
+* **bob config** - create an empty bobconfig.json template
+* **bob info** - display information about bob
