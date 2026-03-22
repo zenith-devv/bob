@@ -47,6 +47,6 @@ public class Program
     {
         Console.WriteLine("bob (build orchestrator binary) version 0.1-alpha");
         Console.WriteLine("copyright (c) 2026 Michael Zenith");
-        Console.WriteLine("licensed under GPL license");
+        Console.WriteLine("licensed under MIT license");
     }
 }

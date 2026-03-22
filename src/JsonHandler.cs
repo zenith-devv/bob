@@ -31,7 +31,7 @@ public static class JsonHandler
         if (!File.Exists(FileName))
         {
             Log(Err, "could not find bob-config.json. make sure to run 'bob make-json' and specify the data.\n");
-            throw new FileNotFoundException();
+            Environment.Exit(1);
         }
         try 
         {
