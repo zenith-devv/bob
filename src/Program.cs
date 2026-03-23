@@ -19,7 +19,13 @@ public class Program
                 BuildAssistant.Build();
                 break;
             case "fetch":
-                Log(Default, "to do\n");
+                if (args.Length < 2) 
+                {
+                    Log(Err, "repo url not specified. usage: bob fetch <url>\n");
+                    break; 
+                }
+                string url = args[1];
+                BuildAssistant.Fetch(url);
                 break;
             case "config":
                 JsonHandler.CreateTemplate();
@@ -45,7 +51,7 @@ public class Program
 
     private static void DisplayInfo()
     {
-        Console.WriteLine("bob (build orchestrator binary) version 0.1-alpha");
+        Console.WriteLine("bob (build orchestrator binary) version 0.2-alpha");
         Console.WriteLine("copyright (c) 2026 Michael Zenith");
         Console.WriteLine("licensed under MIT license");
     }
