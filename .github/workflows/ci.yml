@@ -21,6 +21,7 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
+
       - name: Restore NuGet packages
         run: dotnet restore ${{ env.PROJECT_FILE }}
 
@@ -65,9 +66,11 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
+
       - name: Restore NuGet packages
         run: dotnet restore ${{ env.PROJECT_FILE }}
 
+      # self-contained: runtime w środku, trimmed (~15-20 MB)
       - name: Publish — self-contained
         if: matrix.variant == 'self-contained'
         run: |
@@ -76,8 +79,10 @@ jobs:
             -r ${{ matrix.rid }} \
             --self-contained true \
             -p:PublishSingleFile=true \
+            -p:PublishTrimmed=true \
             -o dist/${{ matrix.rid }}/self-contained
 
+      # binary-only: wymaga .NET na systemie (~100 KB)
       - name: Publish — binary-only
         if: matrix.variant == 'binary-only'
         run: |
@@ -88,6 +93,7 @@ jobs:
             -p:PublishSingleFile=true \
             -o dist/${{ matrix.rid }}/binary-only
 
+      # Zmień nazwę na bob-<rid>-<variant>[.exe] żeby artefakty się nie nadpisywały
       - name: Rename binary
         shell: bash
         run: |
@@ -118,6 +124,7 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
+ 
       - name: Restore NuGet packages
         run: dotnet restore ${{ env.PROJECT_FILE }}
 
@@ -185,7 +192,7 @@ jobs:
       - name: Generate tag name
         id: tag
         run: |
-          TAG="v0.2-alpha.build.${{ github.run_number }}"
+          TAG=$(cat VERSION)
           echo "tag=$TAG" >> $GITHUB_OUTPUT
 
       - name: Push tag
