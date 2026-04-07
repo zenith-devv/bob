@@ -30,7 +30,7 @@ public class Program
             case "config":
                 JsonHandler.CreateTemplate();
                 break;
-            case "info":
+            case "version":
                 DisplayInfo();
                 break;
             default:
@@ -46,12 +46,12 @@ public class Program
         Console.WriteLine("build   : read bob-config.json and compile project to executable");
         Console.WriteLine("fetch   : clone a repository and automatically build the project (if bobconfig.json exists)");
         Console.WriteLine("config  : create an empty bobconfig.json template");
-        Console.WriteLine("info    : display information about bob");
+        Console.WriteLine("version : display bob version");
     }
 
     private static void DisplayInfo()
     {
-        Console.WriteLine("bob (build orchestrator binary) version 0.3.1-alpha");
+        Console.WriteLine("bob (build orchestrator binary) version 0.4-alpha");
         Console.WriteLine("copyright (c) 2026 Michael Zenith");
         Console.WriteLine("licensed under MIT license");
     }

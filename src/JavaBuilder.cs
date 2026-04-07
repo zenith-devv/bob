@@ -37,7 +37,7 @@ public class JavaBuilder : IBuilder
         Log(Default, "mvn is present\n");
 
         // mvn package puts the jar in target/ by default; OutputFile is ignored (Maven controls it)
-        string args = $"package {config.CompilerFlags} -f {config.MainFile}".Trim();
+        string args = $"package {config.CompilerFlags} -f {config.MainFile} -X".Trim();
         Log(Default, $"running \"mvn {args}\"\n");
 
         if (!string.IsNullOrWhiteSpace(config.OutputFile))
@@ -59,10 +59,10 @@ public class JavaBuilder : IBuilder
             return;
         }
         Log(Default, "javac is present\n");
-        Log(Warn, "single file build. for better performance and dependencies use pom.xml (Maven)\n");
+        Log(Warn, "single file build. for better performance and dependencies use pom.xml (mvn)\n");
 
         string outDir = string.IsNullOrWhiteSpace(config.OutputFile) ? "." : config.OutputFile;
-        string args = $"{config.MainFile} -d {outDir} {config.CompilerFlags}".Trim();
+        string args = $"{config.MainFile} -d {outDir} {config.CompilerFlags} -verbose".Trim();
 
         Log(Default, $"running \"javac {args}\"\n");
         int result = CommandRunner.Run("javac", args);

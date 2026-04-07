@@ -1,4 +1,3 @@
-using System.Data;
 using static Logger;
 using static Logger.MessageType;
 
@@ -18,28 +17,36 @@ public static class BuildAssistant
         new RustBuilder(),
         new GoBuilder(),
         new JavaBuilder(),
+        new MesonBuilder(),
     ];
 
     public static void Build()
     {
         var config = JsonHandler.LoadConfig();
-
         if (config == null)
             return;
-            
-        if (string.IsNullOrEmpty(config.MainFile)) 
-        {
-            Log(Err, "MainFile is missing in bob-config.json\n");
-            return;
-        }
 
-        string extension = Path.GetExtension(config.MainFile).ToLower();
-        var builder = Builders.FirstOrDefault(b => b.CanHandle(extension));
+        var builder = Builders.FirstOrDefault(b => b.Detect(Directory.GetCurrentDirectory()));
+
+        if (builder == null)
+        {
+            if (string.IsNullOrEmpty(config.MainFile)) 
+            {
+                Log(Err, "MainFile is missing in bob-config.json and no build system detected\n");
+                return;
+            }
+
+            string extension = Path.GetExtension(config.MainFile).ToLower();
+            builder = Builders.FirstOrDefault(b => b.CanHandle(extension));
+        }
 
         if (builder != null)
             builder.Build(config);
         else
-            Log(Err, $"no builder found for {extension}\n");
+        {
+            string hint = string.IsNullOrEmpty(config.MainFile) ? "unknown" : Path.GetExtension(config.MainFile);
+            Log(Err, $"no builder found for {hint}\n");
+        }
     }
 
     public static void Fetch(string url)
